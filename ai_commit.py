@@ -19,109 +19,79 @@ if not PERPLEXITY_API_KEY:
 
 def get_git_diff():
     try:
-        result = subprocess.run(['git', 'diff', '--cached'], capture_output=True, text=True, check=True)
+        # Get only the specific changes, not the full diff
+        result = subprocess.run(['git', 'diff', '--cached', '--unified=0'], capture_output=True, text=True, check=True)
         return result.stdout
     except subprocess.CalledProcessError:
         print(f"{Fore.RED}Error: No staged changes or the git command failed.")
         sys.exit(1)
 
-def generate_commit_message(diff, num_options=1, use_conventional=False):
+def generate_commit_message(diff):
     url = "https://api.perplexity.ai/chat/completions"
     headers = {
         'Authorization': f'Bearer {PERPLEXITY_API_KEY}',
         'Content-Type': 'application/json'
     }
 
-    system_message = "You are a git commit message generator. Provide extremely concise and specific messages."
-    user_message = f"""Generate {num_options} concise and specific git commit message{'s' if num_options > 1 else ''} for this diff:
+    system_message = """Generate a specific and concise git commit message:
+    - Use imperative mood (e.g., "Add feature" not "Added feature")
+    - Capitalize the first word
+    - No period at the end
+    - Aim for 50 characters or less
+    - Focus on WHAT changed and WHY, not HOW
+    - Be specific about the changes made
+    - Provide ONLY the commit message, no other text"""
 
-Rules:
-- Maximum 50 characters
-- Use imperative mood
-- No period at the end
-- Only the message, no labels or numbering
-- Be specific about the changes made
-{'- Use Conventional Commits format' if use_conventional else ''}
-
-Diff:
-{diff}
-"""
+    user_message = f"Generate a specific git commit message for this diff:\n\n{diff}"
 
     data = {
         "model": "llama-3.1-sonar-small-128k-online",
         "messages": [
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_message}
-        ]
+        ],
+        "temperature": 0.7,
+        "max_tokens": 100
     }
 
     try:
         response = requests.post(url, headers=headers, json=data, timeout=30)
         response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"{Fore.RED}Error making API request: {e}")
-        return ["Failed to generate commit message"]
-
-    try:
         response_data = response.json()
-        content = response_data['choices'][0]['message']['content'].strip()
-        
-        messages = []
-        for line in content.split('\n'):
-            line = line.strip()
-            if line and not line.startswith(('Here are', 'Subject:', 'Body:', 'Commit Message', '###')):
-                clean_line = line.lstrip('0123456789.*- ')
-                if len(clean_line) <= 50:  # Ensure message is not longer than 50 characters
-                    messages.append(clean_line)
-        
-        return messages[:num_options]
-    except (KeyError, IndexError, json.JSONDecodeError) as e:
-        print(f"{Fore.RED}Error parsing API response: {e}")
-        return ["Failed to parse commit message"]
+        commit_message = response_data['choices'][0]['message']['content'].strip().split('\n')[0].strip(':`"')
+        return commit_message
+    except Exception as e:
+        print(f"{Fore.RED}Error generating commit message: {e}")
+        return "Update code"
 
 def main():
     diff = get_git_diff()
     
     if not diff.strip():
-        print(f"{Fore.YELLOW}No changes to commit.")
+        print(f"{Fore.YELLOW}No changes to the commit.")
         return
 
-    print(f"\n{Fore.GREEN}{'=' * 50}")
-    print(f"{Fore.GREEN}🤖 {Style.BRIGHT}Welcome to AICommit!{Style.RESET_ALL}")
-    print(f"{Fore.GREEN}{'=' * 50}\n")
+    print(f"\n{Fore.GREEN}🤖 {Style.BRIGHT}AICommit{Style.RESET_ALL}")
     
-    num_options = int(input(f"{Fore.CYAN}📊 How many commit message options do you want? {Fore.YELLOW}(default: 1) ") or 1)
-    use_conventional = input(f"{Fore.CYAN}🏷️  Use Conventional Commits format? {Fore.YELLOW}(y/N) ").lower() == 'y'
+    print(f"\n{Fore.CYAN}Generating commit message...")
 
-    print(f"\n{Fore.CYAN}🧠 Generating your AI commit message(s)...")
-
-    commit_messages = generate_commit_message(diff, num_options, use_conventional)
+    commit_message = generate_commit_message(diff)
+    print(f"\n{Fore.GREEN}Generated Message:\n{Style.BRIGHT}{commit_message}")
     
-    print(f"\n{Fore.YELLOW}✨ Generated {len(commit_messages)} message(s)")
+    response = input(f"\n{Fore.CYAN}(U)se / (E)dit / (C)ancel: ").lower()
+    if response == 'c':
+        print(f"{Fore.YELLOW}Commit cancelled.")
+        return
+    elif response == 'e':
+        commit_message = input(f"{Fore.CYAN}Edit message: ")
 
-    if len(commit_messages) > 1:
-        for i, message in enumerate(commit_messages, 1):
-            print(f"\n{Fore.MAGENTA}{Style.BRIGHT}{message}")
-        choice = int(input(f"\n{Fore.YELLOW}🔢 Which option would you like to use? {Fore.CYAN}(1-{len(commit_messages)}) ")) - 1
-        commit_message = commit_messages[choice]
-    else:
-        commit_message = commit_messages[0]
-        print(f"\n{Fore.MAGENTA}💡 {Style.BRIGHT}{commit_message}")
-
-    response = input(f"\n{Fore.YELLOW}✅ Would you like to use this commit message? {Fore.CYAN}(Y / n) ").lower()
-    
-    if response in ['y', '']:
-        try:
-            subprocess.run(['git', 'commit', '-m', commit_message], check=True)
-            commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
-            print(f"\n{Fore.GREEN}{'=' * 50}")
-            print(f"{Fore.GREEN}✔️  Commit successful!")
-            print(f"{Fore.GREEN}📝 [main {commit_hash}] {Style.BRIGHT}{commit_message}")
-            print(f"{Fore.GREEN}{'=' * 50}")
-        except subprocess.CalledProcessError:
-            print(f"\n{Fore.RED}❌ Commit failed. Check git command or permissions.")
-    else:
-        print(f"\n{Fore.YELLOW}🚫 Commit cancelled.")
+    try:
+        subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+        commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
+        print(f"\n{Fore.GREEN}✔ Commit successful!")
+        print(f"{Fore.GREEN}[{commit_hash}] {Style.BRIGHT}{commit_message}")
+    except subprocess.CalledProcessError:
+        print(f"\n{Fore.RED}❌ Commit failed. Check git command or permissions.")
 
 if __name__ == "__main__":
     main()
