@@ -4,21 +4,19 @@
 
 ## Progress
 
-To mark a task as complete, replace `[ ]` with `[x]` and add strikethrough to the text.
-
-- [x] ~~Initial project setup~~
-- [x] ~~Add Perplexity AI integration~~
+- [ ] Initial project setup
+- [ ] Add Perplexity AI integration
 - [ ] Implement git diff parsing
-  - [x] ~~Focus on specific changes with `--unified=0`~~
-  - [x] ~~Remove surrounding context lines~~
+  - [ ] Focus on specific changes with `--unified=0`
+  - [ ] Remove surrounding context lines
 - [ ] Improve commit message generation
-  - [x] ~~Limit title to 50 characters~~
-  - [x] ~~Use imperative mood~~
+  - [ ] Limit title to 50 characters
+  - [ ] Use imperative mood
   - [ ] Focus on what/why vs how
-- [x] ~~Simplify user interface~~
-  - [x] ~~Remove multiple message options~~
-  - [x] ~~Streamline user prompts~~
-  - [x] ~~Add edit/cancel options~~
+- [ ] Simplify user interface
+  - [ ] Remove multiple message options
+  - [ ] Streamline user prompts
+  - [ ] Add edit/cancel options
 
 ## Setup
 
@@ -55,9 +53,7 @@ To update the progress:
 
 1. Edit this README.md file
 2. Find the task you want to mark as complete
-3. Change `[ ]` to `[x]`
-4. Add strikethrough to the text by wrapping it in `~~`
-   Example: `- [x] ~~Completed task~~`
-5. Commit and push the changes
+3. Change `[ ]` to `[x]` for that task
+4. Commit and push the changes
 
-This will visually represent completed tasks with both a checked box and strikethrough text.
+This will visually update the checkbox in the GitHub interface.
