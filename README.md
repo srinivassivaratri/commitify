@@ -2,58 +2,100 @@
 
 > AI-powered git commit message generator using Perplexity AI
 
-## Progress
+## Project Journey
 
-- [ ] Initial project setup
-- [ ] Add Perplexity AI integration
-- [ ] Implement git diff parsing
-  - [ ] Focus on specific changes with `--unified=0`
-  - [ ] Remove surrounding context lines
-- [ ] Improve commit message generation
-  - [ ] Limit title to 50 characters
-  - [ ] Use imperative mood
-  - [ ] Focus on what/why vs how
-- [ ] Simplify user interface
-  - [ ] Remove multiple message options
-  - [ ] Streamline user prompts
-  - [ ] Add edit/cancel options
+1. [x] Project Initialization
+   - [x] Create a new directory for the project
+   - [x] Initialize a Git repository
+   - [x] Set up a virtual environment
+
+2. [x] Environment Setup
+   - [x] Create a `.env` file for API key storage
+   - [x] Install required packages
+   - [x] Create `requirements.txt` file
+
+3. [x] Core Functionality Implementation
+   - [x] Implement git diff parsing
+     - [x] Use `git diff --cached --unified=0` for specific changes
+   - [x] Integrate Perplexity AI API
+   - [x] Develop commit message generation logic
+
+4. [x] User Interface Development
+   - [x] Create a command-line interface
+   - [x] Implement colorized output using colorama
+   - [x] Add options to use, edit, or cancel generated messages
+
+5. [x] Code Refinement
+   - [x] Optimize commit message generation
+   - [x] Improve error handling
+   - [x] Enhance code readability and structure
+
+6. [x] Testing and Iteration
+   - [x] Test with various git diffs
+   - [x] Refine commit message quality based on results
+
+7. [x] Documentation
+   - [x] Write comprehensive README.md
+   - [x] Document setup process
+   - [x] Explain usage instructions
+
+8. [ ] Final Touches
+   - [ ] Perform final code review
+   - [ ] Ensure all features are working as expected
+   - [ ] Prepare for public release
 
 ## Setup
 
-1. Clone repo
-2. Create `.env` file:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/commitify.git
+   cd commitify
    ```
-   PERPLEXITY_API_KEY=your_api_key_here
+
+2. Set up a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
    ```
+
 3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
+4. Create a `.env` file in the project root and add your Perplexity AI API key:
+   ```
+   PERPLEXITY_API_KEY=your_api_key_here
+   ```
+
 ## Usage
 
-```bash
-# Stage changes
-git add <files>
+1. Stage your changes:
+   ```bash
+   git add .
+   ```
 
-# Generate commit message
-python ai_commit.py
-```
+2. Run commitify:
+   ```bash
+   python ai_commit.py
+   ```
+
+3. Review the generated commit message. You can:
+   - Use it as is
+   - Edit it
+   - Cancel and write your own
 
 ## Features
 
-☑️ Concise, focused commit messages
-☑️ Git best practices enforced
-☑️ Interactive editing
-☑️ Specific change analysis
+- Generates concise, focused commit messages
+- Enforces git best practices
+- Provides interactive editing
+- Performs specific change analysis
 
-## Updating Progress
+## Contributing
 
-To update the progress:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Edit this README.md file
-2. Find the task you want to mark as complete
-3. Change `[ ]` to `[x]` for that task
-4. Commit and push the changes
+## License
 
-This will visually update the checkbox in the GitHub interface.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
