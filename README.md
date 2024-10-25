@@ -1,3 +1,3 @@
 # commitify
 
-This is a tool to help you write better commit messages.
+This tool helps you write better commit messages.
