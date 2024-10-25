@@ -4,6 +4,8 @@
 
 ## Progress
 
+To mark a task as complete, replace `[ ]` with `[x]`.
+
 - [ ] Initial project setup
 - [ ] Add Perplexity AI integration
 - [ ] Implement git diff parsing
@@ -46,3 +48,14 @@ python ai_commit.py
 ☑️ Git best practices enforced
 ☑️ Interactive editing
 ☑️ Specific change analysis
+
+## Updating Progress
+
+To update the progress:
+
+1. Edit this README.md file
+2. Find the task you want to mark as complete
+3. Change `[ ]` to `[x]` for that task
+4. Commit and push the changes
+
+This will visually update the checkbox in the GitHub interface.
