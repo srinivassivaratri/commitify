@@ -5,6 +5,7 @@ import sys
 import subprocess
 from colorama import init, Fore, Style
 import json
+import textwrap
 
 # Initialize colorama
 init(autoreset=True)
@@ -31,14 +32,15 @@ def generate_commit_message(diff, num_options=1, use_conventional=False):
         'Content-Type': 'application/json'
     }
 
-    system_message = "You are a git commit message generator. Provide extremely concise messages."
-    user_message = f"""Generate {num_options} concise git commit message{'s' if num_options > 1 else ''} for this diff:
+    system_message = "You are a git commit message generator. Provide extremely concise and specific messages."
+    user_message = f"""Generate {num_options} concise and specific git commit message{'s' if num_options > 1 else ''} for this diff:
 
 Rules:
 - Maximum 50 characters
 - Use imperative mood
 - No period at the end
 - Only the message, no labels or numbering
+- Be specific about the changes made
 {'- Use Conventional Commits format' if use_conventional else ''}
 
 Diff:
@@ -62,13 +64,19 @@ Diff:
 
     try:
         response_data = response.json()
-        print(f"{Fore.YELLOW}API Response: {json.dumps(response_data, indent=2)}")
         content = response_data['choices'][0]['message']['content'].strip()
-        messages = [msg.strip() for msg in content.split('\n') if msg.strip() and not msg.strip().startswith(('Subject:', 'Body:', 'Commit Message', '###'))]
+        
+        messages = []
+        for line in content.split('\n'):
+            line = line.strip()
+            if line and not line.startswith(('Here are', 'Subject:', 'Body:', 'Commit Message', '###')):
+                clean_line = line.lstrip('0123456789.*- ')
+                if len(clean_line) <= 50:  # Ensure message is not longer than 50 characters
+                    messages.append(clean_line)
+        
         return messages[:num_options]
     except (KeyError, IndexError, json.JSONDecodeError) as e:
         print(f"{Fore.RED}Error parsing API response: {e}")
-        print(f"{Fore.YELLOW}Raw response: {response.text}")
         return ["Failed to parse commit message"]
 
 def main():
@@ -78,37 +86,42 @@ def main():
         print(f"{Fore.YELLOW}No changes to commit.")
         return
 
-    print(f"{Fore.GREEN}Welcome to AICommit!")
+    print(f"\n{Fore.GREEN}{'=' * 50}")
+    print(f"{Fore.GREEN}🤖 {Style.BRIGHT}Welcome to AICommit!{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}{'=' * 50}\n")
     
-    num_options = int(input(f"{Fore.CYAN}How many commit message options do you want? (default: 1) ") or 1)
-    use_conventional = input(f"{Fore.CYAN}Use Conventional Commits format? (y/N) ").lower() == 'y'
+    num_options = int(input(f"{Fore.CYAN}📊 How many commit message options do you want? {Fore.YELLOW}(default: 1) ") or 1)
+    use_conventional = input(f"{Fore.CYAN}🏷️  Use Conventional Commits format? {Fore.YELLOW}(y/N) ").lower() == 'y'
 
-    print(f"{Fore.CYAN}Generating your AI commit message(s)...")
+    print(f"\n{Fore.CYAN}🧠 Generating your AI commit message(s)...")
 
     commit_messages = generate_commit_message(diff, num_options, use_conventional)
     
-    print(f"{Fore.YELLOW}Generated {len(commit_messages)} message(s)")
+    print(f"\n{Fore.YELLOW}✨ Generated {len(commit_messages)} message(s)")
 
     if len(commit_messages) > 1:
         for i, message in enumerate(commit_messages, 1):
-            print(f"\n{Fore.MAGENTA}{i}. {Style.BRIGHT}{message}")
-        choice = int(input(f"\n{Fore.YELLOW}Which option would you like to use? (1-{len(commit_messages)}) ")) - 1
+            print(f"\n{Fore.MAGENTA}{Style.BRIGHT}{message}")
+        choice = int(input(f"\n{Fore.YELLOW}🔢 Which option would you like to use? {Fore.CYAN}(1-{len(commit_messages)}) ")) - 1
         commit_message = commit_messages[choice]
     else:
         commit_message = commit_messages[0]
-        print(f"\n{Fore.MAGENTA}{Style.BRIGHT}{commit_message}")
+        print(f"\n{Fore.MAGENTA}💡 {Style.BRIGHT}{commit_message}")
 
-    response = input(f"\n{Fore.YELLOW}Would you like to use this commit message? (Y / n) ").lower()
+    response = input(f"\n{Fore.YELLOW}✅ Would you like to use this commit message? {Fore.CYAN}(Y / n) ").lower()
     
     if response in ['y', '']:
         try:
             subprocess.run(['git', 'commit', '-m', commit_message], check=True)
             commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
-            print(f"{Fore.GREEN}[main {commit_hash}] {Style.BRIGHT}{commit_message}")
+            print(f"\n{Fore.GREEN}{'=' * 50}")
+            print(f"{Fore.GREEN}✔️  Commit successful!")
+            print(f"{Fore.GREEN}📝 [main {commit_hash}] {Style.BRIGHT}{commit_message}")
+            print(f"{Fore.GREEN}{'=' * 50}")
         except subprocess.CalledProcessError:
-            print(f"{Fore.RED}Commit failed. Check git command or permissions.")
+            print(f"\n{Fore.RED}❌ Commit failed. Check git command or permissions.")
     else:
-        print(f"{Fore.YELLOW}Commit cancelled.")
+        print(f"\n{Fore.YELLOW}🚫 Commit cancelled.")
 
 if __name__ == "__main__":
     main()
