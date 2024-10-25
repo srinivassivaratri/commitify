@@ -4,19 +4,19 @@
 
 ## Progress
 
-- [x] Initial project setup
-- [x] Add Perplexity AI integration
-- [x] Implement git diff parsing
-  - [x] Focus on specific changes with `--unified=0`
-  - [x] Remove surrounding context lines
-- [x] Improve commit message generation
-  - [x] Limit title to 50 characters
-  - [x] Use imperative mood
-  - [x] Focus on what/why vs how
-- [x] Simplify user interface
-  - [x] Remove multiple message options
-  - [x] Streamline user prompts
-  - [x] Add edit/cancel options
+- [ ] Initial project setup
+- [ ] Add Perplexity AI integration
+- [ ] Implement git diff parsing
+  - [ ] Focus on specific changes with `--unified=0`
+  - [ ] Remove surrounding context lines
+- [ ] Improve commit message generation
+  - [ ] Limit title to 50 characters
+  - [ ] Use imperative mood
+  - [ ] Focus on what/why vs how
+- [ ] Simplify user interface
+  - [ ] Remove multiple message options
+  - [ ] Streamline user prompts
+  - [ ] Add edit/cancel options
 
 ## Setup
 
