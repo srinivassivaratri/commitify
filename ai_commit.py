@@ -33,16 +33,16 @@ def generate_commit_message(diff):
         'Content-Type': 'application/json'
     }
 
-    system_message = """Generate a specific and concise git commit message:
+    system_message = """You are an AI assistant specialized in generating git commit messages. Your task is to create a concise, specific, and meaningful commit message based on the provided git diff. Follow these rules:
     - Use imperative mood (e.g., "Add feature" not "Added feature")
     - Capitalize the first word
     - No period at the end
     - Aim for 50 characters or less
     - Focus on WHAT changed and WHY, not HOW
     - Be specific about the changes made
-    - Provide ONLY the commit message, no other text"""
+    - Provide ONLY the commit message, no other text or explanations"""
 
-    user_message = f"Generate a specific git commit message for this diff:\n\n{diff}"
+    user_message = f"Based on this git diff, generate a specific and concise commit message:\n\n{diff}"
 
     data = {
         "model": "llama-3.1-sonar-small-128k-online",
