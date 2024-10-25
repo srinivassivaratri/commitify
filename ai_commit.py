@@ -33,7 +33,7 @@ def generate_commit_message(diff):
     data = {
         "model": "llama-3.1-sonar-small-128k-online",
         "messages": [
-            {"role": "system", "content": "You are a git commit message generator. Respond ONLY with the commit message itself, no other text. Keep it under 50 characters, focusing on the main change."},
+            {"role": "system", "content": "You are a git commit message generator. Respond ONLY with the commit message itself, no other text. Keep it under 72 characters if possible. Focus on the specific changes made, not just filenames. Use present tense verbs."},
             {"role": "user", "content": f"Generate a commit message for this diff:\n\n{diff}"}
         ]
     }
@@ -48,7 +48,7 @@ def generate_commit_message(diff):
     message = response.json()['choices'][0]['message']['content'].strip()
     # Remove any potential prefixes like "Commit message:" or "Here's a commit message:"
     message = message.split(":")[-1].strip()
-    return message[:50]  # Truncate to 50 characters max
+    return message[:72]  # Truncate to 72 characters max
 
 def main():
     diff = get_git_diff()
