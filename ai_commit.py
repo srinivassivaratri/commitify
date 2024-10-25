@@ -33,25 +33,45 @@ def generate_commit_message(diff):
         'Content-Type': 'application/json'
     }
 
-    system_message = """You are an AI assistant specialized in generating git commit messages. Your task is to create a concise, specific, and meaningful commit message based on the provided git diff. Follow these rules:
-    - Provide a commit title and a description
-    - For the title:
-        - Use imperative mood (e.g., "Add feature" not "Added feature")
-        - Capitalize the first word
-        - No period at the end
-        - Aim for 50 characters or less
-        - Focus on WHAT changed
-    - For the description:
-        - Explain WHY the change was made
-        - Provide context or reasoning behind the change
-        - Keep it concise but informative
-        - Use complete sentences
-    - Separate the title and description with a blank line
-    - Do not use any formatting symbols like *, #, or other markdown syntax
-    - Do not include any prefixes like "Commit Message", "Title:", or "Description:"
-    - Provide ONLY the commit message (title and description), no other text or explanations"""
+    system_message = """You are an AI assistant specialized in generating git commit messages. Your task is to create concise, specific, and meaningful commit messages based on the provided git diff. Follow these rules strictly:
 
-    user_message = f"Based on this git diff, generate a specific commit message with title and description:\n\n{diff}"
+1. Output Format:
+   - Provide ONLY the commit message
+   - First line is the title
+   - Leave one blank line after the title
+   - Following lines are the description
+   - Do not include any labels, markdown, or meta-text
+
+2. Title Requirements:
+   - Maximum 50 characters
+   - Use conventional commits format: type(scope): description
+   - Start with one of: feat|fix|docs|style|refactor|test|chore|perf
+   - Use imperative mood (Add, not Added)
+   - No period at the end
+
+3. Description Requirements:
+   - Maximum 72 characters per line
+   - Use complete sentences with proper punctuation
+   - Explain WHY the change was made, not what was done
+   - Include relevant context and reasoning
+   - Mention related issue numbers if applicable
+
+4. Content Guidelines:
+   - Be specific about what changed
+   - Avoid vague terms like "update", "fix", "change"
+   - Focus on the business impact or user benefit
+   - Mention affected components or modules
+   - Note any breaking changes with "BREAKING CHANGE:" prefix
+
+5. What to Exclude:
+   - No markdown syntax or formatting
+   - No bullet points or lists
+   - No technical implementation details
+   - No redundant information
+   - No meta-text like "Commit Message:" or "Description:"
+   - No signatures or timestamps"""
+
+    user_message = f"Based on this git diff, generate a specific commit message:\n\n{diff}"
 
     data = {
         "model": "llama-3.1-sonar-small-128k-online",
@@ -86,12 +106,13 @@ def main():
 
     commit_message = generate_commit_message(diff)
     
-    # Clean up the commit message
+    # Split the commit message into title and description
     lines = commit_message.split('\n')
-    title = next((line.strip('*#- ') for line in lines if line.strip()), '').replace('*', '')
-    description = '\n'.join(line.strip('*#- ').replace('*', '') for line in lines[1:] if line.strip())
+    title = lines[0].strip()
+    description = '\n'.join(line.strip() for line in lines[2:] if line.strip())
 
-    print(f"\n{Fore.YELLOW + Style.BRIGHT}{title}")
+    print(f"\n{Fore.YELLOW + Style.BRIGHT}Generated Message:")
+    print(f"{Fore.YELLOW + Style.BRIGHT}{title}")
     if description:
         print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
     
@@ -100,11 +121,11 @@ def main():
         print(f"{Fore.YELLOW + Style.BRIGHT}Commit cancelled.")
         return
     elif response == 'e':
-        title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title: ")
-        print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (press Enter twice to finish):")
+        title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title (max 50 chars): ")[:50]
+        print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (max 72 chars per line, press Enter twice to finish):")
         lines = []
         while True:
-            line = input(f"{Fore.YELLOW + Style.BRIGHT}")
+            line = input(f"{Fore.YELLOW + Style.BRIGHT}")[:72]
             if line:
                 lines.append(line)
             else:
