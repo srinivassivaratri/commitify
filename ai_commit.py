@@ -21,7 +21,7 @@ def get_git_diff(max_tokens=100000):  # Set a reasonable token estimate for diff
             return '\n'.join(lines[:50]) + '\n\n... (diff truncated for API limits) ...'
         return result.stdout
     except subprocess.CalledProcessError:
-        print("Error: No staged changes or git command failed.")
+        print("Error: No staged changes or the git command failed.")
         sys.exit(1)
 
 def generate_commit_message(diff):
@@ -33,8 +33,8 @@ def generate_commit_message(diff):
     data = {
         "model": "llama-3.1-sonar-small-128k-online",
         "messages": [
-            {"role": "system", "content": "You are an assistant that generates concise git commit messages based on code diffs. If the diff is large, only consider the first part for brevity."},
-            {"role": "user", "content": f"Generate a commit message for this diff:\n\n{diff}\n(Note: Diff might be truncated)"}
+            {"role": "system", "content": "You are a git commit message generator. Respond ONLY with the commit message itself, no other text. Keep it under 50 characters, focusing on the main change."},
+            {"role": "user", "content": f"Generate a commit message for this diff:\n\n{diff}"}
         ]
     }
 
@@ -45,7 +45,10 @@ def generate_commit_message(diff):
         print(response.text)
         return "Failed to generate commit message due to API error."
     
-    return response.json()['choices'][0]['message']['content'].strip()
+    message = response.json()['choices'][0]['message']['content'].strip()
+    # Remove any potential prefixes like "Commit message:" or "Here's a commit message:"
+    message = message.split(":")[-1].strip()
+    return message[:50]  # Truncate to 50 characters max
 
 def main():
     diff = get_git_diff()
