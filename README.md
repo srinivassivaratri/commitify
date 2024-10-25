@@ -42,8 +42,7 @@ python ai_commit.py
 
 ## Features
 
-- Concise, focused commit messages
-- Git best practices enforced
-- Interactive editing
-- Specific change analysis
-
+☑️ Concise, focused commit messages
+☑️ Git best practices enforced
+☑️ Interactive editing
+☑️ Specific change analysis
