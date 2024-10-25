@@ -77,34 +77,34 @@ def main():
     diff = get_git_diff()
     
     if not diff.strip():
-        print(f"{Fore.YELLOW}No changes to commit.")
+        print(f"{Fore.YELLOW + Style.BRIGHT}No changes to commit.")
         return
 
-    print(f"\n{Fore.YELLOW}AICommit")
+    print(f"\n{Fore.YELLOW + Style.BRIGHT}AICommit")
     
-    print(f"{Fore.YELLOW}Generating commit message...")
+    print(f"{Fore.YELLOW + Style.BRIGHT}Generating commit message...")
 
     commit_message = generate_commit_message(diff)
     
     # Clean up the commit message
     lines = commit_message.split('\n')
-    title = next((line.strip('*#- ') for line in lines if line.strip()), '')
-    description = '\n'.join(line.strip('*#- ') for line in lines[1:] if line.strip())
+    title = next((line.strip('*#- ') for line in lines if line.strip()), '').replace('*', '')
+    description = '\n'.join(line.strip('*#- ').replace('*', '') for line in lines[1:] if line.strip())
 
-    print(f"\n{Fore.YELLOW}{title}")
+    print(f"\n{Fore.YELLOW + Style.BRIGHT}{title}")
     if description:
-        print(f"\n{Fore.YELLOW}{description}")
+        print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
     
-    response = input(f"\n{Fore.YELLOW}(U)se / (E)dit / (C)ancel: ").lower()
+    response = input(f"\n{Fore.YELLOW + Style.BRIGHT}(U)se / (E)dit / (C)ancel: ").lower()
     if response == 'c':
-        print(f"{Fore.YELLOW}Commit cancelled.")
+        print(f"{Fore.YELLOW + Style.BRIGHT}Commit cancelled.")
         return
     elif response == 'e':
-        title = input(f"{Fore.YELLOW}Edit title: ")
-        print(f"{Fore.YELLOW}Edit description (press Enter twice to finish):")
+        title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title: ")
+        print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (press Enter twice to finish):")
         lines = []
         while True:
-            line = input(f"{Fore.YELLOW}")
+            line = input(f"{Fore.YELLOW + Style.BRIGHT}")
             if line:
                 lines.append(line)
             else:
@@ -115,12 +115,12 @@ def main():
     try:
         subprocess.run(['git', 'commit', '-m', commit_message], check=True)
         commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
-        print(f"\n{Fore.YELLOW}Commit successful!")
-        print(f"{Fore.YELLOW}[{commit_hash}] {title}")
+        print(f"\n{Fore.YELLOW + Style.BRIGHT}Commit successful!")
+        print(f"{Fore.YELLOW + Style.BRIGHT}[{commit_hash}] {title}")
         if description:
-            print(f"\n{Fore.YELLOW}{description}")
+            print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
     except subprocess.CalledProcessError:
-        print(f"\n{Fore.RED}Commit failed. Check git command or permissions.")
+        print(f"\n{Fore.RED + Style.BRIGHT}Commit failed. Check git command or permissions.")
 
 if __name__ == "__main__":
     main()
