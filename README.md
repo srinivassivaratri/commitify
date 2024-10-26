@@ -80,10 +80,20 @@
    python ai_commit.py
    ```
 
-3. Review the generated commit message. You can:
-   - Use it as is
-   - Edit it
-   - Cancel and write your own
+3. Choose an option:
+   - Generate a commit message
+   - Generate a project narrative
+   - Exit
+
+4. For commit messages:
+   - Review the generated message
+   - Use it as is, edit it, or cancel and write your own
+
+5. For project narratives:
+   - Specify the number of recent commits to include
+   - Review the generated narrative
+
+The project narrative feature creates a story from your recent commits, providing insights into your project's evolution. This can be particularly useful for onboarding new team members or conducting project retrospectives.
 
 ## Features
 
@@ -91,6 +101,7 @@
 - Enforces git best practices
 - Provides interactive editing
 - Performs specific change analysis
+- Generates project narratives from commit history
 
 ## Contributing
 

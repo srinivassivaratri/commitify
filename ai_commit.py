@@ -104,61 +104,137 @@ def generate_commit_message(diff):
         print(f"{Fore.RED}Error generating commit message: {e}")
         return "Update code"
 
-def main():
-    diff = get_git_diff()
-    
-    if not diff.strip():
-        print(f"{Fore.YELLOW + Style.BRIGHT}No changes to commit.")
-        return
+def get_commit_history(num_commits=10):
+    try:
+        result = subprocess.run(['git', 'log', f'-{num_commits}', '--pretty=format:%H|%s|%ad', '--date=short'], capture_output=True, text=True, check=True)
+        commits = result.stdout.strip().split('\n')
+        return [commit.split('|') for commit in commits]
+    except subprocess.CalledProcessError:
+        print(f"{Fore.RED}Error: Failed to retrieve git commit history.")
+        return []
 
-    print(f"\n{Fore.YELLOW + Style.BRIGHT}AICommit")
-    
-    print(f"{Fore.YELLOW + Style.BRIGHT}Generating commit message...")
+def generate_project_narrative(commits):
+    url = "https://api.perplexity.ai/chat/completions"
+    headers = {
+        'Authorization': f'Bearer {PERPLEXITY_API_KEY}',
+        'Content-Type': 'application/json'
+    }
 
-    commit_message = generate_commit_message(diff)
-    
-    # Split the commit message into title and description
-    lines = commit_message.split('\n')
-    title = lines[0].strip()
-    description = '\n'.join(line.strip() for line in lines[2:] if line.strip())
+    system_message = """You are an AI assistant specialized in creating project narratives from git commit histories. Your task is to weave the commits into a coherent story or timeline of the project's evolution. Follow these guidelines:
 
-    print(f"\n{Fore.YELLOW + Style.BRIGHT}Generated Message:")
-    print(f"{Fore.YELLOW + Style.BRIGHT}{title}")
-    if description:
-        print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
-    
-    response = input(f"\n{Fore.YELLOW + Style.BRIGHT}(U)se / (E)dit / (C)ancel: ").lower()
-    if response == 'c':
-        print(f"{Fore.YELLOW + Style.BRIGHT}Commit cancelled.")
-        return
-    elif response == 'e':
-        while True:
-            title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title (max 50 chars): ")[:50]
-            if any(title.startswith(prefix) for prefix in ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf']):
-                break
-            else:
-                print(f"{Fore.RED}Title must start with one of: feat|fix|docs|style|refactor|test|chore|perf")
-        
-        print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (max 72 chars per line, press Enter twice to finish):")
-        lines = []
-        while True:
-            line = input(f"{Fore.YELLOW + Style.BRIGHT}")[:72]
-            if line:
-                lines.append(line)
-            else:
-                break
-        description = '\n'.join(lines)
-        commit_message = f"{title}\n\n{description}"
+1. Create a narrative that highlights key developments, features, and milestones.
+2. Group related commits together thematically.
+3. Provide insights into the project's progress and direction.
+4. Use a professional yet engaging tone.
+5. Keep the narrative concise but informative.
+6. Highlight any significant changes or pivotal moments in the project's history."""
+
+    commit_history = "\n".join([f"{hash[:7]} - {date} - {message}" for hash, message, date in commits])
+    user_message = f"Based on this git commit history, generate a project narrative:\n\n{commit_history}"
+
+    data = {
+        "model": "llama-3.1-sonar-small-128k-online",
+        "messages": [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_message}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 1000
+    }
 
     try:
-        subprocess.run(['git', 'commit', '-m', commit_message], check=True)
-        commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
-        print(f"\n{Fore.YELLOW + Style.BRIGHT}Commit successful!")
-        print(f"{Fore.YELLOW + Style.BRIGHT}[{commit_hash}] {title}")
-        if description:
-            print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
-    except subprocess.CalledProcessError:
-        print(f"\n{Fore.RED + Style.BRIGHT}Commit failed. Check git command or permissions.")
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        response.raise_for_status()
+        response_data = response.json()
+        narrative = response_data['choices'][0]['message']['content'].strip()
+        return narrative
+    except Exception as e:
+        print(f"{Fore.RED}Error generating project narrative: {e}")
+        return "Failed to generate project narrative."
+
+def main():
+    print(f"\n{Fore.YELLOW + Style.BRIGHT}AICommit")
+    
+    while True:
+        print(f"\n{Fore.YELLOW + Style.BRIGHT}Choose an option:")
+        print(f"{Fore.YELLOW}1. Generate commit message")
+        print(f"{Fore.YELLOW}2. Generate project narrative")
+        print(f"{Fore.YELLOW}3. Exit")
+        
+        choice = input(f"\n{Fore.YELLOW + Style.BRIGHT}Enter your choice (1/2/3): ").strip()
+        
+        if choice == '1':
+            diff = get_git_diff()
+            if not diff.strip():
+                print(f"{Fore.YELLOW + Style.BRIGHT}No changes to commit.")
+                continue
+
+            print(f"{Fore.YELLOW + Style.BRIGHT}Generating commit message...")
+            commit_message = generate_commit_message(diff)
+            
+            # Split the commit message into title and description
+            lines = commit_message.split('\n')
+            title = lines[0].strip()
+            description = '\n'.join(line.strip() for line in lines[2:] if line.strip())
+
+            print(f"\n{Fore.YELLOW + Style.BRIGHT}Generated Message:")
+            print(f"{Fore.YELLOW + Style.BRIGHT}{title}")
+            if description:
+                print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
+            
+            response = input(f"\n{Fore.YELLOW + Style.BRIGHT}(U)se / (E)dit / (C)ancel: ").lower()
+            if response == 'c':
+                print(f"{Fore.YELLOW + Style.BRIGHT}Commit cancelled.")
+                continue
+            elif response == 'e':
+                while True:
+                    title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title (max 50 chars): ")[:50]
+                    if any(title.startswith(prefix) for prefix in ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf']):
+                        break
+                    else:
+                        print(f"{Fore.RED}Title must start with one of: feat|fix|docs|style|refactor|test|chore|perf")
+                
+                print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (max 72 chars per line, press Enter twice to finish):")
+                lines = []
+                while True:
+                    line = input(f"{Fore.YELLOW + Style.BRIGHT}")[:72]
+                    if line:
+                        lines.append(line)
+                    else:
+                        break
+                description = '\n'.join(lines)
+                commit_message = f"{title}\n\n{description}"
+
+            try:
+                subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+                commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
+                print(f"\n{Fore.YELLOW + Style.BRIGHT}Commit successful!")
+                print(f"{Fore.YELLOW + Style.BRIGHT}[{commit_hash}] {title}")
+                if description:
+                    print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
+            except subprocess.CalledProcessError:
+                print(f"\n{Fore.RED + Style.BRIGHT}Commit failed. Check git command or permissions.")
+        
+        elif choice == '2':
+            num_commits = int(input(f"{Fore.YELLOW + Style.BRIGHT}Enter the number of commits to include in the narrative: "))
+            commits = get_commit_history(num_commits)
+            if not commits:
+                continue
+
+            print(f"{Fore.YELLOW + Style.BRIGHT}Generating project narrative...")
+            narrative = generate_project_narrative(commits)
+            
+            print(f"\n{Fore.YELLOW + Style.BRIGHT}Project Narrative:")
+            print(f"{Fore.WHITE}{narrative}")
+            
+            input(f"\n{Fore.YELLOW + Style.BRIGHT}Press Enter to continue...")
+        
+        elif choice == '3':
+            print(f"{Fore.YELLOW + Style.BRIGHT}Exiting AICommit. Goodbye!")
+            break
+        
+        else:
+            print(f"{Fore.RED}Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
