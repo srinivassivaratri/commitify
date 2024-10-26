@@ -1,10 +1,28 @@
 # Commitify
 
-AI-powered git commit message generator using Perplexity AI.
+## Task
+Create an AI-powered tool that generates meaningful git commit messages automatically.
 
-## Installation
+## Spec
+- Use Perplexity AI to generate commit messages
+- Provide a command-line interface (CLI) for easy use
+- Allow users to edit or cancel the generated message
+- Support custom API key input
 
-1. Clone the repository:
+## Plan
+1. Set up the project structure
+2. Implement the core functionality:
+   - Get git diff
+   - Generate commit message using Perplexity AI
+   - Handle user interaction
+3. Create a CLI interface
+4. Package the tool for easy installation
+
+## Code
+
+### Installation
+
+1. Clone the repo:
    ```
    git clone https://github.com/your_username/commitify.git
    cd commitify
@@ -19,48 +37,40 @@ AI-powered git commit message generator using Perplexity AI.
    - Create a `.env` file in your home directory or project root
    - Add your API key: `PERPLEXITY_API_KEY=your_api_key_here`
 
-## Usage
+### Usage
 
-After installation, you can use the `ai-commit` command directly in your git repository:
+In your git repository, after staging your changes:
 
 ```
 ai-commit
 ```
 
-You can also provide the API key directly:
+To provide the API key directly:
 
 ```
 ai-commit --api-key your_api_key_here
 ```
 
-Alternatively, you can run the script as a module:
+### Development
 
-```
-python -m aicommit
-```
+To set up for development:
 
-Follow the prompts to generate, edit, or use the AI-generated commit message.
-
-## Development
-
-To set up the development environment:
-
-1. Create a virtual environment:
+1. Create and activate a virtual environment:
    ```
    python -m venv venv
    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
 
-2. Install the package in editable mode:
+2. Install in editable mode:
    ```
    pip install -e .
    ```
 
-3. Install development dependencies:
+3. Install dev dependencies:
    ```
    pip install -r requirements.txt
    ```
 
 ## License
 
-This project is licensed under the MIT License.
+This project is under the MIT License.
