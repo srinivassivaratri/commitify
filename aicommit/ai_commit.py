@@ -1,11 +1,13 @@
+#!/usr/bin/env python3
 import os
 from dotenv import load_dotenv
 import requests
 import sys
 import subprocess
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 import json
 import textwrap
+import argparse
 
 # Initialize colorama with autoreset
 init(autoreset=True)
@@ -13,9 +15,6 @@ init(autoreset=True)
 # Load the API key from .env file
 load_dotenv()
 PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
-
-if not PERPLEXITY_API_KEY:
-    raise ValueError("No Perplexity API key found. Please set it in your .env file.")
 
 def get_git_diff():
     try:
@@ -107,6 +106,18 @@ BREAKING CHANGE: requires email verification for all new signups."""
         return "Update code"
 
 def main():
+    parser = argparse.ArgumentParser(description="Generate AI-powered commit messages for your git repository.")
+    parser.add_argument("--api-key", help="Perplexity API key (overrides .env file)")
+    args = parser.parse_args()
+
+    global PERPLEXITY_API_KEY
+    if args.api_key:
+        PERPLEXITY_API_KEY = args.api_key
+    
+    if not PERPLEXITY_API_KEY:
+        print(f"{Fore.RED}Error: No Perplexity API key found. Please set it in your .env file or use the --api-key option.")
+        sys.exit(1)
+
     print(f"\n{Fore.YELLOW + Style.BRIGHT}AICommit")
     
     diff = get_git_diff()
