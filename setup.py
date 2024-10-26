@@ -14,9 +14,9 @@ setup(
     url="https://github.com/srinivassivaratri/commitify",
     packages=find_packages(),
     install_requires=[
-        "requests",
-        "python-dotenv",
-        "colorama",
+        "requests>=2.31.0,<3.0.0",
+        "python-dotenv>=0.19.0,<2.0.0",
+        "colorama>=0.4.4,<0.5.0",
     ],
     entry_points={
         "console_scripts": [
@@ -25,8 +25,9 @@ setup(
     },
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7,<4.0",
 )
