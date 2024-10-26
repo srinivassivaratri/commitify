@@ -48,6 +48,7 @@ def generate_commit_message(diff):
    - Start with one of: feat|fix|docs|style|refactor|test|chore|perf
    - Use imperative mood (Add, not Added)
    - No period at the end
+   - Example: "feat(auth): add password reset endpoint"
 
 3. Description Requirements:
    - Maximum 72 characters per line
@@ -80,7 +81,7 @@ def generate_commit_message(diff):
             {"role": "user", "content": user_message}
         ],
         "temperature": 0.7,
-        "max_tokens": 200
+        "max_tokens": 300
     }
 
     try:
@@ -88,6 +89,16 @@ def generate_commit_message(diff):
         response.raise_for_status()
         response_data = response.json()
         commit_message = response_data['choices'][0]['message']['content'].strip()
+        
+        # Remove the "feat(utility): " part from the title
+        lines = commit_message.split('\n')
+        title = lines[0]
+        if ':' in title:
+            title = title.split(':', 1)[1].strip()
+        
+        # Reconstruct the commit message
+        commit_message = f"{title}\n\n" + '\n'.join(lines[2:])
+        
         return commit_message
     except Exception as e:
         print(f"{Fore.RED}Error generating commit message: {e}")
@@ -121,7 +132,13 @@ def main():
         print(f"{Fore.YELLOW + Style.BRIGHT}Commit cancelled.")
         return
     elif response == 'e':
-        title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title (max 50 chars): ")[:50]
+        while True:
+            title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title (max 50 chars): ")[:50]
+            if any(title.startswith(prefix) for prefix in ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf']):
+                break
+            else:
+                print(f"{Fore.RED}Title must start with one of: feat|fix|docs|style|refactor|test|chore|perf")
+        
         print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (max 72 chars per line, press Enter twice to finish):")
         lines = []
         while True:
