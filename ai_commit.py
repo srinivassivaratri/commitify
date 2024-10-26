@@ -117,46 +117,33 @@ def main():
     print(f"{Fore.YELLOW + Style.BRIGHT}Generating commit message...")
     commit_message = generate_commit_message(diff)
     
-    # Split the commit message into title and description
-    lines = commit_message.split('\n')
-    title = lines[0].strip()
-    description = '\n'.join(line.strip() for line in lines[2:] if line.strip())
-
     print(f"\n{Fore.YELLOW + Style.BRIGHT}Generated Message:")
-    print(f"{Fore.YELLOW + Style.BRIGHT}{title}")
-    if description:
-        print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
+    print(f"{Fore.YELLOW + Style.BRIGHT}{commit_message}")
     
     response = input(f"\n{Fore.YELLOW + Style.BRIGHT}(U)se / (E)dit / (C)ancel: ").lower()
     if response == 'c':
         print(f"{Fore.YELLOW + Style.BRIGHT}Commit cancelled.")
         return
     elif response == 'e':
-        while True:
-            title = input(f"{Fore.YELLOW + Style.BRIGHT}Edit title (max 50 chars): ")[:50]
-            if any(title.startswith(prefix) for prefix in ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf']):
-                break
-            else:
-                print(f"{Fore.RED}Title must start with one of: feat|fix|docs|style|refactor|test|chore|perf")
-        
-        print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (max 72 chars per line, press Enter twice to finish):")
+        print(f"{Fore.YELLOW + Style.BRIGHT}Edit commit message (press Enter twice to finish):")
         lines = []
         while True:
-            line = input(f"{Fore.YELLOW + Style.BRIGHT}")[:72]
+            line = input(f"{Fore.YELLOW + Style.BRIGHT}")
             if line:
                 lines.append(line)
             else:
+                if not lines:  # If the user hasn't entered anything yet, continue
+                    continue
                 break
-        description = '\n'.join(lines)
-        commit_message = f"{title}\n\n{description}"
+        commit_message = '\n'.join(lines)
 
     try:
         subprocess.run(['git', 'commit', '-m', commit_message], check=True)
         commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode().strip()
         print(f"\n{Fore.YELLOW + Style.BRIGHT}Commit successful!")
-        print(f"{Fore.YELLOW + Style.BRIGHT}[{commit_hash}] {title}")
-        if description:
-            print(f"\n{Fore.YELLOW + Style.BRIGHT}{description}")
+        print(f"{Fore.YELLOW + Style.BRIGHT}[{commit_hash}] {commit_message.split('\n')[0]}")
+        if len(commit_message.split('\n')) > 1:
+            print(f"\n{Fore.YELLOW + Style.BRIGHT}{'\n'.join(commit_message.split('\n')[1:])}")
     except subprocess.CalledProcessError:
         print(f"\n{Fore.RED + Style.BRIGHT}Commit failed. Check git command or permissions.")
 

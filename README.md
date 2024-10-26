@@ -63,8 +63,8 @@ Create a tool that automatically generates meaningful and standardized git commi
 
 3. Review the generated commit message:
    - Use it as is
-   - Edit it
-   - Cancel and write your own
+   - Edit it freely
+   - Write your own message from scratch
 
 ### How It Works
 
@@ -75,7 +75,10 @@ Create a tool that automatically generates meaningful and standardized git commi
    - Description: Max 72 chars per line, explains WHY the change was made
    - Focuses on business impact or user benefit
    - Mentions affected components and any breaking changes
-4. Allow user to review, edit, or use the message
+4. Allow user to review the message, with options to:
+   - Use the generated message as is
+   - Edit the generated message freely
+   - Write a completely new message
 
 ### Configuration
 
