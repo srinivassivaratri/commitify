@@ -1,50 +1,31 @@
-# commitify
+# Commitify
 
-> AI-powered git commit message generator using Perplexity AI
+AI-powered git commit message generator using Perplexity AI
 
-## Project Journey
+## Task
 
-1. [x] Project Initialization
-   - [x] Create a new directory for the project
-   - [x] Initialize a Git repository
-   - [x] Set up a virtual environment
+Create a tool that automatically generates meaningful and standardized git commit messages based on the staged changes in a git repository.
 
-2. [x] Environment Setup
-   - [x] Create a `.env` file for API key storage
-   - [x] Install required packages
-   - [x] Create `requirements.txt` file
+## Spec
 
-3. [x] Core Functionality Implementation
-   - [x] Implement git diff parsing
-     - [x] Use `git diff --cached --unified=0` for specific changes
-   - [x] Integrate Perplexity AI API
-   - [x] Develop commit message generation logic
+- Use Perplexity AI API for generating commit messages
+- Follow Conventional Commits format
+- Provide interactive editing of generated messages
+- Handle common error scenarios
+- Ensure easy setup and usage
 
-4. [x] User Interface Development
-   - [x] Create a command-line interface
-   - [x] Implement colorized output using colorama
-   - [x] Add options to use, edit, or cancel generated messages
+## Plan
 
-5. [x] Code Refinement
-   - [x] Optimize commit message generation
-   - [x] Improve error handling
-   - [x] Enhance code readability and structure
+1. Set up project structure and environment
+2. Implement git diff retrieval
+3. Integrate Perplexity AI API for message generation
+4. Develop user interaction for message review and editing
+5. Implement error handling and edge cases
+6. Create documentation and usage instructions
 
-6. [x] Testing and Iteration
-   - [x] Test with various git diffs
-   - [x] Refine commit message quality based on results
+## Code
 
-7. [x] Documentation
-   - [x] Write comprehensive README.md
-   - [x] Document setup process
-   - [x] Explain usage instructions
-
-8. [ ] Final Touches
-   - [ ] Perform final code review
-   - [ ] Ensure all features are working as expected
-   - [ ] Prepare for public release
-
-## Setup
+### Setup
 
 1. Clone the repository:
    ```bash
@@ -63,40 +44,50 @@
    pip install -r requirements.txt
    ```
 
-4. Create a `.env` file in the project root and add your Perplexity AI API key:
+4. Create a `.env` file in the project root:
    ```
    PERPLEXITY_API_KEY=your_api_key_here
    ```
 
-## Usage
+### Usage
 
 1. Stage your changes:
    ```bash
    git add .
    ```
 
-2. Run commitify:
+2. Run Commitify:
    ```bash
    python ai_commit.py
    ```
 
-3. Review the generated commit message. You can:
+3. Review the generated commit message:
    - Use it as is
    - Edit it
    - Cancel and write your own
 
-The tool will generate a commit message based on your staged changes, allowing you to quickly create meaningful and standardized commit messages.
+### How It Works
 
-## Features
+1. Retrieve git diff of staged changes
+2. Send diff to Perplexity AI API with instructions
+3. Receive generated commit message
+4. Allow user to review, edit, or use the message
 
-- Generates concise, focused commit messages
-- Enforces git best practices
-- Provides interactive editing
-- Performs specific change analysis
+### Configuration
+
+Set the following in your `.env` file:
+- `PERPLEXITY_API_KEY`: Your Perplexity AI API key
+
+### Error Handling
+
+Commitify handles:
+- No staged changes
+- API connection failures
+- Invalid API responses
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Please submit a Pull Request.
 
 ## License
 
