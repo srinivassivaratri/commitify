@@ -9,7 +9,7 @@ Create a tool that automatically generates meaningful and standardized git commi
 ## Spec
 
 - Use Perplexity AI API for generating commit messages
-- Follow Conventional Commits format
+- Follow Conventional Commits format with detailed rules
 - Provide interactive editing of generated messages
 - Handle common error scenarios
 - Ensure easy setup and usage
@@ -69,8 +69,12 @@ Create a tool that automatically generates meaningful and standardized git commi
 ### How It Works
 
 1. Retrieve git diff of staged changes
-2. Send diff to Perplexity AI API with instructions
-3. Receive generated commit message
+2. Send diff to Perplexity AI API with detailed instructions
+3. Receive generated commit message following specific rules:
+   - Title: Max 50 chars, conventional commits format
+   - Description: Max 72 chars per line, explains WHY the change was made
+   - Focuses on business impact or user benefit
+   - Mentions affected components and any breaking changes
 4. Allow user to review, edit, or use the message
 
 ### Configuration
@@ -84,6 +88,36 @@ Commitify handles:
 - No staged changes
 - API connection failures
 - Invalid API responses
+
+## Commit Message Rules
+
+Commitify generates messages following these rules:
+
+1. Title:
+   - Maximum 50 characters
+   - Format: type(scope): description
+   - Starts with: feat|fix|docs|style|refactor|test|chore|perf
+   - Uses imperative mood
+   - No period at the end
+
+2. Description:
+   - Maximum 72 characters per line
+   - Explains WHY the change was made
+   - Includes relevant context and reasoning
+   - Mentions related issue numbers if applicable
+
+3. Content Guidelines:
+   - Specific about what changed
+   - Focuses on business impact or user benefit
+   - Mentions affected components or modules
+   - Notes any breaking changes with "BREAKING CHANGE:" prefix
+
+4. Excludes:
+   - Markdown syntax or formatting
+   - Bullet points or lists
+   - Technical implementation details
+   - Redundant information
+   - Meta-text, signatures, or timestamps
 
 ## Contributing
 

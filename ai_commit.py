@@ -56,6 +56,10 @@ def generate_commit_message(diff):
    - Explain WHY the change was made, not what was done
    - Include relevant context and reasoning
    - Mention related issue numbers if applicable
+   - Example:
+     "Implements password reset functionality to improve user experience.
+      Users were frequently requesting this feature through support.
+      Closes #123."
 
 4. Content Guidelines:
    - Be specific about what changed
@@ -70,7 +74,15 @@ def generate_commit_message(diff):
    - No technical implementation details
    - No redundant information
    - No meta-text like "Commit Message:" or "Description:"
-   - No signatures or timestamps"""
+   - No signatures or timestamps
+
+Example of correct output:
+Implement email verification flow
+
+Add email verification step during registration to reduce spam accounts.
+This change improves platform security and ensures valid user contact info.
+Required by new compliance requirements.
+BREAKING CHANGE: requires email verification for all new signups."""
 
     user_message = f"Based on this git diff, generate a specific commit message:\n\n{diff}"
 
@@ -89,16 +101,6 @@ def generate_commit_message(diff):
         response.raise_for_status()
         response_data = response.json()
         commit_message = response_data['choices'][0]['message']['content'].strip()
-        
-        # Remove the "feat(utility): " part from the title
-        lines = commit_message.split('\n')
-        title = lines[0]
-        if ':' in title:
-            title = title.split(':', 1)[1].strip()
-        
-        # Reconstruct the commit message
-        commit_message = f"{title}\n\n" + '\n'.join(lines[2:])
-        
         return commit_message
     except Exception as e:
         print(f"{Fore.RED}Error generating commit message: {e}")
@@ -136,7 +138,7 @@ def main():
                 break
             else:
                 print(f"{Fore.RED}Title must start with one of: feat|fix|docs|style|refactor|test|chore|perf")
-            
+        
         print(f"{Fore.YELLOW + Style.BRIGHT}Edit description (max 72 chars per line, press Enter twice to finish):")
         lines = []
         while True:
