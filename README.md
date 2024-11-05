@@ -1,79 +1,94 @@
-# Commitify
+# 🤖 Commitify
 
-## Task
-Create an AI-powered tool that generates meaningful git commit messages automatically using Perplexity AI.
+A CLI tool that generates meaningful git commit messages using Perplexity AI's powerful language models.
 
-## Spec
-- Generate commit messages based on staged git changes
-- Provide a command-line interface (CLI) for easy use
-- Allow users to edit or cancel the generated message
-- Support custom API key input
-- Compatible with Python 3.7 and above
+## Why?
 
-## Plan
-1. Set up the project structure
-2. Implement core functionality:
-   - Fetch git diff for staged changes
-   - Generate commit message using Perplexity AI
-   - Handle user interaction (use/edit/cancel)
-3. Create a CLI interface with argparse
-4. Package the tool for easy installation and global use
+Writing good commit messages is hard. They need to be concise yet descriptive, follow conventions, and provide context. Most developers end up with vague messages like "fix bug" or "update code" that make git history useless.
 
-## Code
+Commitify solves this by automatically analyzing your staged changes and generating high-quality commit messages that:
+- Follow conventional commits format
+- Include both summary and detailed description
+- Provide context about why changes were made
+- Maintain consistent style across your repository
 
-### Installation
+## 🚀 Quick Start
 
-1. Install the package globally:
-   ```
-   pip install git+https://github.com/srinivassivaratri/commitify.git
-   ```
-
-2. Set up your Perplexity API key:
-   - Create a `.env` file in your home directory
-   - Add your API key: `PERPLEXITY_API_KEY=your_api_key_here`
-
-### Usage
-
-In any git repository, after staging your changes:
-
+1. Install Commitify:
+```bash
+pip install git+https://github.com/srinivassivaratri/commitify.git
 ```
+
+2. Add your Perplexity API key to `~/.env`:
+```bash
+PERPLEXITY_API_KEY=your_api_key_here
+```
+
+3. Stage your changes and run:
+```bash
 ai-commit
 ```
 
-To provide the API key directly:
+## 📖 Usage
 
+### Basic Usage
+After staging changes with `git add`, simply run:
+```bash
+ai-commit
 ```
+
+### Provide API Key via CLI
+```bash
 ai-commit --api-key your_api_key_here
 ```
 
-Follow the prompts to use, edit, or cancel the generated commit message.
+### Interactive Options
+After generating a message, you can:
+- `U`: Use the message as-is
+- `E`: Edit the message before committing
+- `C`: Cancel without committing
 
-### Development
+The generated messages follow conventional commits format:
+```
+type(scope): description
 
-To set up for development:
+Detailed explanation of why this change was made
+Additional context and impact
+```
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/srinivassivaratri/commitify.git
-   cd commitify
-   ```
+## 🤝 Contributing
 
-2. Create and activate a virtual environment:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
+### Setup Development Environment
 
-3. Install in editable mode:
-   ```
-   pip install -e .
-   ```
+1. Clone the repo:
+```bash
+git clone https://github.com/srinivassivaratri/commitify.git
+cd commitify
+```
 
-4. Install development dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+2. Create and activate virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-## License
+3. Install dependencies:
+```bash
+pip install -e .
+pip install -r requirements.txt
+```
 
-This project is under the MIT License.
+### Run Tests
+```bash
+python -m unittest discover tests
+```
+
+### Submit Changes
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
